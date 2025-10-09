@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Crypto Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Crypto Dashboard</h1>
+
+    <!-- Dropdown de moedas -->
+    <form method="get" action="/">
+        <label for="coin">Escolha a moeda:</label>
+        <select name="coin" id="coin" onchange="this.form.submit()">
+            {% for c in coins_list %}
+                <option value="{{ c }}" {% if c == coin %}selected{% endif %}>{{ c.capitalize() }}</option>
+            {% endfor %}
+        </select>
+    </form>
+
+    <canvas id="cryptoChart" width="800" height="400"></canvas>
+
+    <script>
+        const rawLabels = {{ labels|safe }};
+        const rawData = {{ data|safe }};
+        const labels = rawLabels.map(ts => {
+            const d = new Date(ts);
+            return d.toLocaleString();
+        });
+        const data = rawData;
+
+        const ctx = document.getElementById('cryptoChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '{{ coin.capitalize() }} price (USD)',
+                    data: data,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            }
+        });
+    </script>
+</body>
+</html>
